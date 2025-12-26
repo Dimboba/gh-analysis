@@ -1,0 +1,50 @@
+spring:
+  liquibase:
+    change-log: classpath:changelog/db.changelog-master.yaml
+  application:
+    name: loader
+  batch:
+    jdbc:
+      initialize-schema: never
+    job:
+      enabled: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/loader-service
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 32
+      minimum-idle: 10
+  kafka:
+    producer:
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:29092}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        linger.ms: ${PRODUCER_LINGER_MS:20}
+        batch.size: ${PRODUCER_BATCH_SIZE:200}
+
+
+app:
+  kafka:
+    topic: gh-repositories
+  executor:
+    max-pool-size: ${MAX_POOL_SIZE:8}
+  # Comma-separated list of tokens. Example: "token1,token2,token3"
+  api-keys: ${API_KEYS:}
+  api-key: ${API_KEY:}
+  local:
+    save-always: false
+    directory: "./data/backlog"
+
+  minio:
+    username: ${MINIO_USERNAME:}
+    password: ${MINIO_PASSWORD:}
+    url: ${MINIO_URL:http://storage.yandexcloud.net}
+    bucket-name: dimboba-github-repositories
+    records-per-file: 1000
+
+logging:
+  level:
+    com.hulk: INFO
